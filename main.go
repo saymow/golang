@@ -155,8 +155,6 @@ func handleAlbums(c *gin.Context) {
 }
 
 func main() {
-	fmt.Println(os.Getenv("DB_CONN"))
-
 	var err error
 	db, err = pgx.Connect(context.Background(), os.Getenv("DB_CONN"))
 
