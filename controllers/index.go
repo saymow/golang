@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"com.saymow/services"
+	"com.saymow/structs/album"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 	_ "github.com/joho/godotenv/autoload"
@@ -18,7 +19,7 @@ func HandleAlbumByArtist(c *gin.Context, db *pgx.Conn) {
 }
 
 func HandleAddAlbum(c *gin.Context, db *pgx.Conn) {
-	var createAlbumDTO services.CreateAlbumDTO
+	var createAlbumDTO album.CreateAlbumDTO
 
 	if err := c.BindJSON(&createAlbumDTO); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid params"})

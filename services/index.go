@@ -5,25 +5,13 @@ import (
 	"database/sql"
 	"fmt"
 
+	"com.saymow/structs/album"
 	"github.com/jackc/pgx/v5"
 	_ "github.com/joho/godotenv/autoload"
 )
 
-type CreateAlbumDTO struct {
-	Title  string  `json:"title"`
-	Artist string  `json:"artist"`
-	Price  float64 `json:"price"`
-}
-
-type Album struct {
-	ID     int     `json:"id"`
-	Title  string  `json:"title"`
-	Artist string  `json:"artist"`
-	Price  float64 `json:"price"`
-}
-
-func GetAlbumsByArtist(db *pgx.Conn, name string) ([]Album, error) {
-	var albums []Album
+func GetAlbumsByArtist(db *pgx.Conn, name string) ([]album.Album, error) {
+	var albums []album.Album
 
 	rows, err := db.Query(context.TODO(), "SELECT * FROM album WHERE artist=$1", name)
 
@@ -34,7 +22,7 @@ func GetAlbumsByArtist(db *pgx.Conn, name string) ([]Album, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var alb Album
+		var alb album.Album
 
 		if err := rows.Scan(&alb.ID, &alb.Title, &alb.Artist, &alb.Price); err != nil {
 			return nil, fmt.Errorf("getAlbumsByArtist %q: %v", name, err)
@@ -50,14 +38,14 @@ func GetAlbumsByArtist(db *pgx.Conn, name string) ([]Album, error) {
 	return albums, nil
 }
 
-func AddAlbum(db *pgx.Conn, createAlbumDTO CreateAlbumDTO) error {
+func AddAlbum(db *pgx.Conn, createAlbumDTO album.CreateAlbumDTO) error {
 	_, err := db.Exec(context.TODO(), "INSERT INTO album (title, artist, price) VALUES ($1, $2, $3)", createAlbumDTO.Title, createAlbumDTO.Artist, createAlbumDTO.Price)
 
 	return err
 }
 
-func GetAlbumById(db *pgx.Conn, id int) (Album, error) {
-	var album Album
+func GetAlbumById(db *pgx.Conn, id int) (album.Album, error) {
+	var album album.Album
 	row := db.QueryRow(context.TODO(), "SELECT * FROM album WHERE id = $1", id)
 
 	if scanErr := row.Scan(&album.ID, &album.Title, &album.Artist, &album.Price); scanErr != nil {
@@ -71,8 +59,8 @@ func GetAlbumById(db *pgx.Conn, id int) (Album, error) {
 	return album, nil
 }
 
-func GetAlbums(db *pgx.Conn) ([]Album, error) {
-	var albums = []Album{}
+func GetAlbums(db *pgx.Conn) ([]album.Album, error) {
+	var albums = []album.Album{}
 	rows, err := db.Query(context.Background(), "SELECT * FROM album")
 
 	if err != nil {
@@ -82,7 +70,7 @@ func GetAlbums(db *pgx.Conn) ([]Album, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var alb Album
+		var alb album.Album
 
 		if err := rows.Scan(&alb.ID, &alb.Title, &alb.Artist, &alb.Price); err != nil {
 			return nil, fmt.Errorf("getAlbums %v", err)
